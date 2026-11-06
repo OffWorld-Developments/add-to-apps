@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a problem with installing or using Add to Applications.
+title: "Bug: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a suspected security issue, use the repository's Security tab instead of a public bug report.
+        Replace private file paths in any logs you share. Do not upload the executable itself.
+  - type: input
+    id: version
+    attributes:
+      label: Extension version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Distribution and GNOME / Files versions
+      placeholder: "Arch Linux, GNOME 51.1, Files 51.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: action
+    attributes:
+      label: Where does the problem occur?
+      options:
+        - Installation or upgrade
+        - Add to Applications
+        - Launching from Super search
+        - Rename or remove
+        - Undo
+        - Uninstallation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and observed result
+      description: Include what you expected and what happened. Mention whether the file is a native executable, AppImage, or script.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant error message or logs
+      description: Remove private information before posting.
+      render: text
