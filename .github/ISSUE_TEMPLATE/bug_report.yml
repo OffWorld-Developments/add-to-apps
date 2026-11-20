@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with installing or using Add to Applications.
+description: Report a problem with installing or using Add to Apps.
 title: "Bug: "
 body:
   - type: markdown

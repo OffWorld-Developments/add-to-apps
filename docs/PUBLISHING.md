@@ -2,7 +2,7 @@
 
 ## Distribution
 
-Add to Applications is a **GNOME Files / Nautilus extension**. Its Python loader
+Add to Apps is a **GNOME Files / Nautilus extension**. Its Python loader
 is installed into Nautilus's extension directory. The supported release artifact
 is a source archive containing the per-user installer and uninstaller.
 
@@ -25,7 +25,11 @@ References:
 
 ## Prepare the repository
 
-Suggested repository name: **add-to-applications**.
+Repository: [OffWorld-Developments/add-to-apps](https://github.com/OffWorld-Developments/add-to-apps).
+
+The configured SSH remote is `git@github.com:OffWorld-Developments/add-to-apps.git`.
+The repository rename does not change installed package names, application IDs or
+existing launcher files. Source archives keep the `add-to-applications-*` name.
 
 Suggested description:
 
@@ -33,9 +37,9 @@ Suggested description:
 
 Suggested topics: `gnome`, `nautilus-extension`, `desktop-entry`, `linux`, `python`.
 
-Before the first push:
+Before making the repository public:
 
-1. Choose the actual repository owner and retain the GPL-3.0-or-later license.
+1. Confirm the intended visibility and retain the GPL-3.0-or-later license.
 2. Confirm the application ID in `src/add_to_applications/__init__.py`. It is
    already used by existing installations and Undo notifications; changing it
    requires an upgrade/migration plan. A repository name change does not require
@@ -47,8 +51,9 @@ Before the first push:
    result for changes to the default branch. Hosted CI has not run until there is
    an actual repository and a workflow run.
 
-This source folder has no remote repository configured. Creating a public remote,
-pushing code, and submitting any website listing are separate publication actions.
+Review [the pre-publication audit](SECURITY-AUDIT.md), including its scope and the
+hosted content that could not be inspected. Updating the local remote does not
+push code or change the repository's visibility.
 
 ## Build and inspect a release
 
@@ -92,5 +97,5 @@ for 14 days. Workflow artifacts are build outputs, not published GitHub releases
 5. Publish when the owner is ready. No workflow in this project publishes a release
    automatically or holds write permission to repository contents.
 
-Use the actual repository URL for homepage, bug-report and security links once it
-exists. Record the tag commit and hosted CI run in the release notes.
+Keep homepage, bug-report and security links in sync with the repository URL.
+Record the tag commit and hosted CI run in the release notes.

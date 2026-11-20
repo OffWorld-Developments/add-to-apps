@@ -5,6 +5,12 @@ description = "One-click application launchers from GNOME Files"
 requires-python = ">=3.11"
 license = "GPL-3.0-or-later"
 
+[project.urls]
+Homepage = "https://github.com/OffWorld-Developments/add-to-apps"
+Repository = "https://github.com/OffWorld-Developments/add-to-apps"
+Issues = "https://github.com/OffWorld-Developments/add-to-apps/issues"
+Security = "https://github.com/OffWorld-Developments/add-to-apps/security/policy"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

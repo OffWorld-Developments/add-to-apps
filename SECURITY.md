@@ -16,3 +16,7 @@ for a secure contact channel without including the vulnerability details.
 Relevant checks cover literal filename handling, desktop field-code injection,
 unmanaged files, symlinks, stale Undo, corrupt state, and installation manifests.
 These checks do not constitute a security audit of the selected executable.
+
+CI scans the fetched Git history, working files and generated source archives with
+Gitleaks before saving release artifacts. Scanner output redacts detected values.
+See [the pre-publication audit](docs/SECURITY-AUDIT.md) for the initial audit scope.

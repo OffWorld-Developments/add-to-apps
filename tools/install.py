@@ -131,7 +131,34 @@ def load_manifest(data_home: Path):
     return manifest, files
 
 
-def install(data_home: Path):
+def installation_status(data_home: Path) -> bool:
+    """Inspect persisted installation files, without creating or repairing anything."""
+    _manifest, files = load_manifest(data_home)
+    print(f"Data directory: {data_home}")
+    if not files:
+        print("Not installed for this user.")
+        print("Run this installer without --uninstall to install persistently.")
+        return False
+    missing, modified = [], []
+    for relative, checksum in files.items():
+        raw = read_regular(data_home / relative)
+        if raw is None:
+            missing.append(relative)
+        elif hashlib.sha256(raw).hexdigest() != checksum:
+            modified.append(relative)
+    if missing or modified:
+        print("Installation is incomplete or modified.")
+        for relative in missing:
+            print(f"  Missing: {relative}")
+        for relative in modified:
+            print(f"  Modified: {relative}")
+        print("Re-run the installer to restore missing files. Modified files are kept safe.")
+        return False
+    print("Installed files are present and intact.")
+    return True
+
+
+def install(data_home: Path, *, staged: bool = False):
     files = payload(data_home)
     manifest, previous = load_manifest(data_home)
     backups = {}
@@ -163,8 +190,13 @@ def install(data_home: Path):
             else:
                 atomic_write(path, raw, 0o644)
         raise
-    print(f"Installed Add to Applications {VERSION} in {data_home}")
-    print("Restart Files when convenient (nautilus -q), then open it again.")
+    if staged:
+        print(f"Staged Add to Applications {VERSION} in {data_home}")
+        print("Use the normal installer for your desktop's persistent user installation.")
+    else:
+        print(f"Installed Add to Applications {VERSION} in {data_home}")
+        print("Files loads this installation at startup, including after login or reboot.")
+        print("Restart Files when convenient (nautilus -q), then open it again.")
 
 
 def uninstall(data_home: Path):
@@ -189,6 +221,7 @@ def uninstall(data_home: Path):
         except OSError:
             pass
     print("Uninstalled. Existing application shortcuts and executable files were kept.")
+    print("The extension will not load the next time Files starts or after reboot.")
     print("Restart Files when convenient (nautilus -q), then open it again.")
 
 
@@ -200,27 +233,39 @@ def main():
         default=xdg_path("XDG_DATA_HOME", ".local/share"),
         help="explicit XDG data directory (also useful for staging)",
     )
-    parser.add_argument("--uninstall", action="store_true")
-    parser.add_argument("--check", action="store_true", help="check runtime dependencies only")
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument("--uninstall", action="store_true")
+    actions.add_argument("--check", action="store_true", help="check runtime dependencies only")
+    actions.add_argument("--status", action="store_true",
+                         help="verify installed files and runtime dependencies")
     parser.add_argument(
         "--stage",
         action="store_true",
         help="stage files without checking this machine's dependencies",
     )
     args = parser.parse_args()
-    if args.check and (args.stage or args.uninstall):
-        parser.error("--check cannot be combined with --stage or --uninstall")
+    if args.stage and (args.check or args.status or args.uninstall):
+        parser.error("--stage cannot be combined with --check, --status, or --uninstall")
     if os.getuid() == 0:
         parser.error("Run as your normal user, without sudo.")
     if not args.data_home.is_absolute():
         parser.error("--data-home must be an absolute path")
     try:
+        if args.status:
+            if not installation_status(args.data_home):
+                return 1
+            check_dependencies()
+            print("Runtime dependencies are available; Files can load it at startup.")
+            return 0
         if not args.uninstall and not args.stage:
             check_dependencies()
         if args.check:
             print("All runtime dependencies are available.")
             return 0
-        (uninstall if args.uninstall else install)(args.data_home)
+        if args.uninstall:
+            uninstall(args.data_home)
+        else:
+            install(args.data_home, staged=args.stage)
     except (OSError, ValueError, LauncherError) as error:
         print(f"Installation error: {error}", file=sys.stderr)
         return 1

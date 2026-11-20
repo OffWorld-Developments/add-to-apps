@@ -11,3 +11,24 @@ dist/
 .coverage
 htmlcov/
 .aws/
+
+# Local credentials and private keys
+.ssh/
+.gnupg/
+.git-credentials
+.netrc
+.npmrc
+.pypirc
+credentials.json
+credentials.*.json
+service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+
+# Local diagnostics may contain private paths or credentials
+*.log
+gitleaks-report.*

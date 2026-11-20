@@ -18,10 +18,15 @@ jobs:
         run: >-
           pacman -Syu --noconfirm --needed git python python-gobject python-cairo
           nautilus nautilus-python gtk4 libadwaita desktop-file-utils
-          python-pytest ruff dbus xorg-server-xvfb xorg-xauth
+          python-pytest ruff dbus xorg-server-xvfb xorg-xauth gitleaks
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Scan Git history for secrets
+        run: >-
+          gitleaks git --log-opts="--all --full-history"
+          --redact=100 --no-banner --ignore-gitleaks-allow
       - name: Lint
         run: |
           ruff check .
@@ -39,6 +44,10 @@ jobs:
           else
             python3 tools/package.py
           fi
+      - name: Scan source and release archives for secrets
+        run: >-
+          gitleaks dir . --max-archive-depth=2
+          --redact=100 --no-banner --ignore-gitleaks-allow
       - name: Save release files
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

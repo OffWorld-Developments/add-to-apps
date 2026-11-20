@@ -1,4 +1,4 @@
-# Add to Applications
+# Add to Apps
 
 **Right-click an executable in GNOME Files → Add to Applications. Done.**
 
@@ -142,3 +142,10 @@ integration would be a separate component with its own interface and tests.
 
 See [publishing](docs/PUBLISHING.md) for repository setup, release artifacts, and
 the distinction between Files and Shell extension distribution.
+
+[Repository](https://github.com/OffWorld-Developments/add-to-apps) ·
+[Releases](https://github.com/OffWorld-Developments/add-to-apps/releases) ·
+[Report a bug](https://github.com/OffWorld-Developments/add-to-apps/issues)
+
+The installed Python package, application ID and `add-to-applications-*` launcher
+files retain their original names so existing installations remain compatible.

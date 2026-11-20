@@ -57,13 +57,19 @@ static void expect_file(const char *path, gboolean expected) {
 }
 
 int main(int argc, char **argv) {
-    g_assert_cmpint(argc, ==, 4);
+    g_assert(argc == 4 || argc == 5);
     loader_path = argv[1]; source_path = argv[2];
     GTypeModule *module = g_object_new(probe_module_get_type(), NULL);
     g_type_module_set_name(module, "add-to-applications-loader-probe");
     g_assert(g_type_module_use(module));
     const GType *types; int count;
     list_types(&types, &count);
+    if (argc == 5) {
+        g_assert_cmpstr(argv[4], ==, "--expect-uninstalled");
+        g_assert_cmpint(count, ==, 0);
+        g_print("Real embedded loader: extension is absent after uninstall\n");
+        return 0;
+    }
     g_assert_cmpint(count, ==, 1);
     g_assert(g_type_is_a(types[0], NAUTILUS_TYPE_MENU_PROVIDER));
     NautilusMenuProvider *provider = g_object_new(types[0], NULL);

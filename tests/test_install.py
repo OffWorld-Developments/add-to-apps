@@ -108,3 +108,50 @@ def test_manifest_cannot_claim_an_unrelated_file_inside_data_home(tmp_path):
     with pytest.raises(LauncherError, match="invalid path"):
         installer.uninstall(data)
     assert unrelated.exists()
+
+
+def test_status_distinguishes_dependencies_from_persisted_installation(tmp_path, capsys):
+    data = tmp_path / "data"
+    assert not installer.installation_status(data)
+    assert "Not installed" in capsys.readouterr().out
+    assert not data.exists(), "Status must not create any installation files"
+    installer.install(data)
+    capsys.readouterr()
+    assert installer.installation_status(data)
+    assert "present and intact" in capsys.readouterr().out
+    installer.uninstall(data)
+    capsys.readouterr()
+    assert not installer.installation_status(data)
+    assert "Not installed" in capsys.readouterr().out
+
+
+def test_status_reports_missing_and_modified_files(tmp_path, capsys):
+    data = tmp_path / "data"
+    installer.install(data)
+    capsys.readouterr()
+    entry = data / "nautilus-python/extensions/add_to_applications_extension.py"
+    entry.unlink()
+    runner = data / "add-to-applications/add_to_applications/runner.py"
+    runner.write_text("A local edit")
+    assert not installer.installation_status(data)
+    output = capsys.readouterr().out
+    assert "Missing: nautilus-python/extensions/add_to_applications_extension.py" in output
+    assert "Modified: add-to-applications/add_to_applications/runner.py" in output
+    assert runner.read_text() == "A local edit"
+
+
+def test_reinstall_restores_missing_files_and_rechecks_status(tmp_path):
+    data = tmp_path / "data"
+    installer.install(data)
+    entry = data / "nautilus-python/extensions/add_to_applications_extension.py"
+    entry.unlink()
+    assert not installer.installation_status(data)
+    installer.install(data)
+    assert installer.installation_status(data)
+
+
+def test_stage_message_does_not_claim_a_normal_desktop_install(tmp_path, capsys):
+    installer.install(tmp_path / "stage", staged=True)
+    output = capsys.readouterr().out
+    assert "Staged Add to Applications" in output
+    assert "Files loads this installation" not in output
